@@ -3,7 +3,7 @@ from uuid import uuid4
 
 import requests
 
-from m0rkcoin_tip_bot.config import config
+from talleo_tip_bot.config import config
 
 
 class RPCException(Exception):
@@ -16,7 +16,8 @@ def call_method(method_name: str, payload: Dict = None) -> Dict:
         'params': payload or {},
         'jsonrpc': '2.0',
         'id': str(uuid4()),
-        'method': f'{method_name}'
+        'method': f'{method_name}',
+        'password': f'{config.wallet.password}'
     }
     resp = requests.post(
         f'http://{config.wallet.host}:{config.wallet.port}/json_rpc',

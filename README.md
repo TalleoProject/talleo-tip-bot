@@ -1,11 +1,11 @@
-# M0rkcoin Tip Bot
+# Talleo Tip Bot
 
-This is a Discord bot that can transfer M0RK between users. It supports:
+This is a Discord bot that can transfer TLO between users. It supports:
 
-- Deposit M0RK
-- Tip M0RK to Discord users
-- See your account info and M0RK balance
-- Withdraw M0RK to your wallet
+- Deposit TLO
+- Tip TLO to Discord users
+- See your account info and TLO balance
+- Withdraw TLO to your wallet
 
 ## Installation
 
@@ -13,25 +13,25 @@ This is a Discord bot that can transfer M0RK between users. It supports:
 
 - MongoDB
 - walletd (wallet daemon)
-- m0rkcoind (coin daemon)
+- Talleod (coin daemon)
 - Python 3.6
 - [Discord Bot Token](https://discordapp.com/developers/applications/me)
 
-I recommend using `supervisor` to keep `m0rkcoind`, `walletd`
+I recommend using `supervisor` to keep `Talleod`, `walletd`
 and `bot.py` running.
 
 Here are some sample configs:
 
 ```ini
 [program:bot]
-command = /path/to/bin/python /path/to/m0rkcoin-tip-bot/m0rkcoin_tip_bot/bot.py
+command = /path/to/bin/python /path/to/talleo-tip-bot/talleo_tip_bot/bot.py
 user = user
 autostart = yes
 autorestart = yes
 environment = LC_ALL="C.UTF-8",LANG="C.UTF-8"
 
-[program:m0rkcoind]
-command = /path/to/m0rkcoind
+[program:Talleod]
+command = /path/to/Talleod
 user = user
 autostart = true
 autorestart = true
@@ -56,9 +56,9 @@ This project can most certainly be adapted to any
 [CryptoNote](https://github.com/forknote/cryptonote-generator) coin.
 You most likely won't have to change much.
 
-- Change or remove the regex validation in `m0rkcoin_tip_bot.models:WalletAddressField`
+- Change or remove the regex validation in `talleo_tip_bot.models:WalletAddressField`
 to match the address prefix of your coin.
-- Adapt the `M0RKCOIN_DIGITS` and `M0RKCOIN_REPR` to match your coin.
+- Adapt the `TALLEO_DIGITS` and `TALLEO_REPR` to match your coin.
 
 ## Usage
 
@@ -68,7 +68,7 @@ to match the address prefix of your coin.
 Will be used to withdraw later.
 - `$info`: See your deposit and withdrawal addresses.
 - `$balance`: See your current available and pending balance.
-- `$tip <user_mention> <amount>`: Tip `<amount>` M0RK to `<user_mention>`.
+- `$tip <user_mention> <amount>`: Tip `<amount>` TLO to `<user_mention>`.
 - `$withdraw <amount>`: Withdraws `<amount>` to your registered
 withdrawal address.
 

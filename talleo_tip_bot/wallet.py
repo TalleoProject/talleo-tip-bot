@@ -1,7 +1,7 @@
 from typing import List, Dict
 
-from m0rkcoin_tip_bot import rpc_client
-from m0rkcoin_tip_bot.config import config
+from talleo_tip_bot import rpc_client
+from talleo_tip_bot.config import config
 
 
 def register() -> str:

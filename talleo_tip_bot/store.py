@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from m0rkcoin_tip_bot import models, wallet
+from talleo_tip_bot import models, wallet
 
 
 def register_user(user_id: str, user_wallet: str = None) -> models.User:

@@ -4,7 +4,7 @@ database:
   port: 27017
   user: ""
   password: ""
-  db: "m0rkcoin_bot"
+  db: "talleo_bot"
 
 # Discord Bot user token
 discord:
@@ -13,12 +13,13 @@ discord:
 # walletd connection information
 wallet:
   host: "127.0.0.1"
-  port: "8070"
+  port: "33777"
+  password: ""
 
-# M0RK is 12-digit, 1000000000000
-tx_fee: 10000000
-min_tx_amount: 1000000000000
-max_tx_amount: 2000000000000000
+# TLO is 2-digit, 100
+tx_fee: 1
+min_tx_amount: 100
+max_tx_amount: 30000000000
 
 # How many seconds between balance refresh with walletd
 wallet_balance_update_interval: 30
