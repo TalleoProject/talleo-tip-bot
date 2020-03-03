@@ -16,6 +16,8 @@ bot_help_info = "Get your account's info."
 bot_help_withdraw = f"Withdraw {TALLEO_REPR} from your balance."
 bot_help_balance = f"Check your {TALLEO_REPR} balance."
 bot_help_tip = f"Give {TALLEO_REPR} to a user from your balance."
+bot_help_optimize = "Optimize wallet."
+bot_help_outputs = "Get number of optimizable and unspent outputs."
 
 bot = commands.Bot(command_prefix='$')
 
@@ -153,6 +155,46 @@ async def tip(context: commands.Context, member: discord.Member,
                     f'Transaction hash: `{tip.tx_hash}`')
 
 
+@bot.command(pass_context=True, help=bot_help_outputs)
+async def outputs(context: commands.Context):
+    user = models.User = models.User.objects(
+        user_id=context.message.author.id).first()
+
+    user_balance_wallet: models.Wallet = models.Wallet.objects(
+        wallet_address=user.balance_wallet_address).first()
+
+    threshold = user_balance_wallet.actual_balance
+
+    estimate = store.estimate_fusion(user, threshold)
+
+    await bot.send_message(
+        context.message.author,
+        f'Optimizable outputs: `{estimate.fusion_ready_count}`\n'
+        f'Unspent outputs: `{estimate.total_count}`')
+
+
+@bot.command(pass_context=True, help=bot_help_optimize)
+async def optimize(context: commands.Context):
+    user = models.User = models.User.objects(
+        user_id=context.message.author.id).first()
+
+    user_balance_wallet: models.Wallet = models.Wallet.objects(
+        wallet_address=user.balance_wallet_address).first()
+
+    threshold = user_balance_wallet.actual_balance
+
+    estimate = store.estimate_fusion(user, threshold)
+
+    if estimate['fusion_ready_count'] == 0:
+        await bot.reply('No optimizable outputs!')
+        return
+
+    optimize = store.send_fusion(user, threshold)
+
+    await bot.send_message(context.message.author, 'Fusion transaction sent.\n'
+                           f'Transaction hash: `{optimize.tx_hash}`')
+
+
 @register.error
 async def register_error(error, _: commands.Context):
     await handle_errors(error)
@@ -175,6 +217,16 @@ async def withdraw_error(error, _: commands.Context):
 
 @tip.error
 async def tip_error(error, _: commands.Context):
+    await handle_errors(error)
+
+
+@outputs.error
+async def outputs_error(error, _: commands.Context):
+    await handle_errors(error)
+
+
+@optimize.error
+async def optimize_error(error, _: commands.Context):
     await handle_errors(error)
 
 

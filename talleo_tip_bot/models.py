@@ -35,3 +35,16 @@ class Withdrawal(Document):
     amount = LongField(required=True)
     date = DateTimeField(required=True)
     tx_hash = StringField()
+
+
+class EstimateFusion(Document):
+    user = ReferenceField(User, required=True)
+    threshold = LongField(required=True)
+    fusion_ready_count = LongField()
+    total_count = LongField()
+
+
+class SendFusion(Document):
+    user = ReferenceField(User, required=True)
+    threshold = LongField(required=True)
+    tx_hash = StringField()

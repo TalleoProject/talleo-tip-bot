@@ -55,6 +55,30 @@ def withdraw(user: models.User, amount: int) -> models.Withdrawal:
     return withdrawal
 
 
+def estimate_fusion(user: models.User,
+                    threshold: int) -> models.EstimateFusion:
+    fusion = models.EstimateFusion(user=user, threshold=threshold)
+
+    outputs = wallet.estimate_fusion(user.balance_wallet_address, threshold)
+
+    fusion.fusion_ready_count = outputs['fusion_ready_count']
+    fusion.total_count = outputs['total_count']
+    fusion.save()
+
+    return fusion
+
+
+def send_fusion(user: models.User, threshold: int) -> models.SendFusion:
+    fusion = models.SendFusion(user=user, threshold=threshold)
+
+    tx_hash = wallet.send_fusion(user.balance_wallet_address, threshold)
+
+    fusion.tx_hash = tx_hash
+    fusion.save()
+
+    return fusion
+
+
 def update_balances():
     print('Updating all wallet balances')
     wallets = models.Wallet.objects
