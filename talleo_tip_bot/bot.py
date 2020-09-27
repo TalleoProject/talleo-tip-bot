@@ -70,11 +70,11 @@ async def register(context: commands.Context, wallet_address: str):
     user = (existing_user or
             store.register_user(user_id, user_wallet=wallet_address))
 
-    await bot.send_message(context.message.author,
-                           f'You have been registered.\n'
-                           f'You can send your deposits to '
-                           f'`{user.balance_wallet_address}` and your '
-                           f'balance will be available once confirmed.')
+    await bot.send_message(
+        context.message.author, f'You have been registered.\n'
+        f'You can send your deposits to '
+        f'`{user.balance_wallet_address}` and your '
+        f'balance will be available once confirmed.')
 
 
 @bot.command(pass_context=True, help=bot_help_withdraw)
@@ -86,18 +86,18 @@ async def withdraw(context: commands.Context, amount: float):
     if not user.user_wallet_address:
         await bot.send_message(
             context.message.author,
-            f'You do not have a withdrawal address, please use '
-            f'`$register <wallet_address>` to register.')
+            'You do not have a withdrawal address, please use '
+            '`$register <wallet_address>` to register.')
         return
 
     user_balance_wallet: models.Wallet = models.Wallet.objects(
         wallet_address=user.balance_wallet_address).first()
 
     if real_amount + config.tx_fee >= user_balance_wallet.actual_balance:
-        await bot.send_message(context.message.author,
-                               f'Insufficient balance to withdraw '
-                               f'{real_amount / TALLEO_DIGITS:.2f} '
-                               f'{TALLEO_REPR}.')
+        await bot.send_message(
+            context.message.author, f'Insufficient balance to withdraw '
+            f'{real_amount / TALLEO_DIGITS:.2f} '
+            f'{TALLEO_REPR}.')
         return
 
     if real_amount > config.max_tx_amount:
@@ -191,8 +191,9 @@ async def optimize(context: commands.Context):
 
     optimize = store.send_fusion(user, threshold)
 
-    await bot.send_message(context.message.author, 'Fusion transaction sent.\n'
-                           f'Transaction hash: `{optimize.tx_hash}`')
+    await bot.send_message(
+        context.message.author, 'Fusion transaction sent.\n'
+        f'Transaction hash: `{optimize.tx_hash}`')
 
 
 @register.error
