@@ -24,7 +24,7 @@ Here are some sample configs:
 
 ```ini
 [program:bot]
-command = /path/to/bin/python /path/to/talleo-tip-bot/talleo_tip_bot/bot.py
+command = /path/to/bin/python /path/to/talleo-tip-bot/talleo_tip_bot/bot.py --config /path/to/config.yml
 user = user
 autostart = yes
 autorestart = yes
@@ -39,7 +39,7 @@ directory = /path/to
 environment=HOME="/home/user"
 
 [program:walletd]
-command = /path/to/walletd --container-file wallet/tip_wallets --container-password ******
+command = /path/to/walletd --container-file wallet/tip_wallets --container-password ****** --rpc-password ******
 user = user
 autostart = true
 autorestart = true
