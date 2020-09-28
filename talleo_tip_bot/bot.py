@@ -130,6 +130,14 @@ async def tip(context: commands.Context, member: discord.Member,
     user_from_wallet: models.Wallet = models.Wallet.objects(
         wallet_address=user_from.balance_wallet_address).first()
 
+    if bot.user.mention == member.mention:
+        await bot.reply('HODL!')
+        return
+
+    if context.message.author.mention == member.mention:
+        await bot.reply('Tipping oneself will just waste your balance!')
+        return
+
     if real_amount + config.tx_fee >= user_from_wallet.actual_balance:
         await bot.reply(f'Insufficient balance to send tip of '
                         f'{real_amount / TALLEO_DIGITS:.2f} '
