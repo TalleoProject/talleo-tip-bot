@@ -11,7 +11,7 @@ TALLEO_DIGITS = 100
 TALLEO_REPR = 'TLO'
 
 bot_description = f"Tip {TALLEO_REPR} to other users on your server."
-bot_help_register = "Register or change your deposit address."
+bot_help_register = "Register or change your withdrawal address."
 bot_help_info = "Get your account's info."
 bot_help_withdraw = f"Withdraw {TALLEO_REPR} from your balance."
 bot_help_balance = f"Check your {TALLEO_REPR} balance."
@@ -59,9 +59,10 @@ async def register(context: commands.Context, wallet_address: str):
         existing_user = store.register_user(existing_user.user_id,
                                             user_wallet=wallet_address)
         if prev_address:
-            await context.send(f'Your deposit address has been changed from:\n'
-                               f'`{prev_address}`\n to\n '
-                               f'`{existing_user.user_wallet_address}`')
+            await context.send(
+                f'Your withdrawal address has been changed from:\n'
+                f'`{prev_address}`\n to\n '
+                f'`{existing_user.user_wallet_address}`')
             return
 
     user = (existing_user or
