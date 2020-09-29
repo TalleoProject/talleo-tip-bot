@@ -29,30 +29,29 @@ async def on_ready():
     print(bot.user.id)
 
 
-@bot.command(pass_context=True, help=bot_help_info)
+@bot.command(help=bot_help_info)
 async def info(context: commands.Context):
-    user = store.register_user(context.message.author.id)
-    await bot.send_message(
-        context.message.author, f'**Account Info**\n\n'
-        f'Deposit Address: `{user.balance_wallet_address}`\n\n'
-        f'Registered Wallet: `{user.user_wallet_address}`')
+    user = store.register_user(str(context.message.author.id))
+    await context.send(f'**Account Info**\n\n'
+                       f'Deposit Address: `{user.balance_wallet_address}`\n\n'
+                       f'Registered Wallet: `{user.user_wallet_address}`')
 
 
-@bot.command(pass_context=True, help=bot_help_balance)
+@bot.command(help=bot_help_balance)
 async def balance(context: commands.Context):
-    user = store.register_user(context.message.author.id)
+    user = store.register_user(str(context.message.author.id))
     wallet = store.get_user_wallet(user.user_id)
-    await bot.send_message(
-        context.message.author, '**Your balance**\n\n'
+    await context.send(
+        '**Your balance**\n\n'
         f'Available: {wallet.actual_balance / TALLEO_DIGITS:.2f} '
         f'{TALLEO_REPR}\n'
         f'Pending: {wallet.locked_balance / TALLEO_DIGITS:.2f} '
         f'{TALLEO_REPR}\n')
 
 
-@bot.command(pass_context=True, help=bot_help_register)
+@bot.command(help=bot_help_register)
 async def register(context: commands.Context, wallet_address: str):
-    user_id = context.message.author.id
+    user_id = str(context.message.author.id)
 
     existing_user: models.User = models.User.objects(user_id=user_id).first()
     if existing_user:
@@ -60,113 +59,105 @@ async def register(context: commands.Context, wallet_address: str):
         existing_user = store.register_user(existing_user.user_id,
                                             user_wallet=wallet_address)
         if prev_address:
-            await bot.send_message(
-                context.message.author,
-                f'Your deposit address has been changed from:\n'
-                f'`{prev_address}`\n to\n '
-                f'`{existing_user.user_wallet_address}`')
+            await context.send(f'Your deposit address has been changed from:\n'
+                               f'`{prev_address}`\n to\n '
+                               f'`{existing_user.user_wallet_address}`')
             return
 
     user = (existing_user or
             store.register_user(user_id, user_wallet=wallet_address))
 
-    await bot.send_message(
-        context.message.author, f'You have been registered.\n'
-        f'You can send your deposits to '
-        f'`{user.balance_wallet_address}` and your '
-        f'balance will be available once confirmed.')
+    await context.send(f'You have been registered.\n'
+                       f'You can send your deposits to '
+                       f'`{user.balance_wallet_address}` and your '
+                       f'balance will be available once confirmed.')
 
 
-@bot.command(pass_context=True, help=bot_help_withdraw)
+@bot.command(help=bot_help_withdraw)
 async def withdraw(context: commands.Context, amount: float):
     user: models.User = models.User.objects(
-        user_id=context.message.author.id).first()
+        user_id=str(context.message.author.id)).first()
     real_amount = int(amount * TALLEO_DIGITS)
 
     if not user.user_wallet_address:
-        await bot.send_message(
-            context.message.author,
-            'You do not have a withdrawal address, please use '
-            '`$register <wallet_address>` to register.')
+        await context.send('You do not have a withdrawal address, please use '
+                           '`$register <wallet_address>` to register.')
         return
 
     user_balance_wallet: models.Wallet = models.Wallet.objects(
         wallet_address=user.balance_wallet_address).first()
 
     if real_amount + config.tx_fee >= user_balance_wallet.actual_balance:
-        await bot.send_message(
-            context.message.author, f'Insufficient balance to withdraw '
-            f'{real_amount / TALLEO_DIGITS:.2f} '
-            f'{TALLEO_REPR}.')
+        await context.send(f'Insufficient balance to withdraw '
+                           f'{real_amount / TALLEO_DIGITS:.2f} '
+                           f'{TALLEO_REPR}.')
         return
 
     if real_amount > config.max_tx_amount:
-        await bot.reply(f'Transactions cannot be bigger than '
-                        f'{config.max_tx_amount / TALLEO_DIGITS:.2f} '
-                        f'{TALLEO_REPR}')
+        await context.send(f'Transactions cannot be bigger than '
+                           f'{config.max_tx_amount / TALLEO_DIGITS:.2f} '
+                           f'{TALLEO_REPR}')
         return
     elif real_amount < config.min_tx_amount:
-        await bot.reply(f'Transactions cannot be lower than '
-                        f'{config.min_tx_amount / TALLEO_DIGITS:.2f} '
-                        f'{TALLEO_REPR}')
+        await context.send(f'Transactions cannot be lower than '
+                           f'{config.min_tx_amount / TALLEO_DIGITS:.2f} '
+                           f'{TALLEO_REPR}')
         return
 
     withdrawal = store.withdraw(user, real_amount)
-    await bot.send_message(
-        context.message.author,
-        f'You have withdrawn {real_amount / TALLEO_DIGITS:.2f} '
-        f'{TALLEO_REPR}.\n'
-        f'Transaction hash: `{withdrawal.tx_hash}`')
+    await context.send(f'You have withdrawn {real_amount / TALLEO_DIGITS:.2f} '
+                       f'{TALLEO_REPR}.\n'
+                       f'Transaction hash: `{withdrawal.tx_hash}`')
 
 
-@bot.command(pass_context=True, help=bot_help_tip)
+@bot.command(help=bot_help_tip)
 async def tip(context: commands.Context, member: discord.Member,
               amount: float):
     user_from: models.User = models.User.objects(
-        user_id=context.message.author.id).first()
-    user_to: models.User = store.register_user(member.id)
+        user_id=str(context.message.author.id)).first()
+    user_to: models.User = store.register_user(str(member.id))
     real_amount = int(amount * TALLEO_DIGITS)
 
     user_from_wallet: models.Wallet = models.Wallet.objects(
         wallet_address=user_from.balance_wallet_address).first()
 
     if bot.user.mention == member.mention:
-        await bot.reply('HODL!')
+        await context.send('HODL!')
         return
 
     if context.message.author.mention == member.mention:
-        await bot.reply('Tipping oneself will just waste your balance!')
+        await context.send('Tipping oneself will just waste your balance!')
         return
 
     if real_amount + config.tx_fee >= user_from_wallet.actual_balance:
-        await bot.reply(f'Insufficient balance to send tip of '
-                        f'{real_amount / TALLEO_DIGITS:.2f} '
-                        f'{TALLEO_REPR} to {member.mention}.')
+        await context.send(f'Insufficient balance to send tip of '
+                           f'{real_amount / TALLEO_DIGITS:.2f} '
+                           f'{TALLEO_REPR} to {member.mention}.')
         return
 
     if real_amount > config.max_tx_amount:
-        await bot.reply(f'Transactions cannot be bigger than '
-                        f'{config.max_tx_amount / TALLEO_DIGITS:.2f} '
-                        f'{TALLEO_REPR}.')
+        await context.send(f'Transactions cannot be bigger than '
+                           f'{config.max_tx_amount / TALLEO_DIGITS:.2f} '
+                           f'{TALLEO_REPR}.')
         return
     elif real_amount < config.min_tx_amount:
-        await bot.reply(f'Transactions cannot be smaller than '
-                        f'{config.min_tx_amount / TALLEO_DIGITS:.2f} '
-                        f'{TALLEO_REPR}.')
+        await context.send(f'Transactions cannot be smaller than '
+                           f'{config.min_tx_amount / TALLEO_DIGITS:.2f} '
+                           f'{TALLEO_REPR}.')
         return
 
     tip = store.send_tip(user_from, user_to, real_amount)
 
-    await bot.reply(f'Tip of {real_amount / TALLEO_DIGITS:.2f} '
-                    f'{TALLEO_REPR} '
-                    f'was sent to {member.mention}\n'
-                    f'Transaction hash: `{tip.tx_hash}`')
+    await context.send(f'Tip of {real_amount / TALLEO_DIGITS:.2f} '
+                       f'{TALLEO_REPR} '
+                       f'was sent to {member.mention}\n'
+                       f'Transaction hash: `{tip.tx_hash}`')
 
 
-@bot.command(pass_context=True, help=bot_help_outputs)
+@bot.command(help=bot_help_outputs)
 async def outputs(context: commands.Context):
     user = models.User = models.User.objects(
-        user_id=context.message.author.id).first()
+        user_id=str(context.message.author.id)).first()
 
     user_balance_wallet: models.Wallet = models.Wallet.objects(
         wallet_address=user.balance_wallet_address).first()
@@ -175,16 +166,15 @@ async def outputs(context: commands.Context):
 
     estimate = store.estimate_fusion(user, threshold)
 
-    await bot.send_message(
-        context.message.author,
+    await context.send(
         f'Optimizable outputs: `{estimate.fusion_ready_count}`\n'
         f'Unspent outputs: `{estimate.total_count}`')
 
 
-@bot.command(pass_context=True, help=bot_help_optimize)
+@bot.command(help=bot_help_optimize)
 async def optimize(context: commands.Context):
     user = models.User = models.User.objects(
-        user_id=context.message.author.id).first()
+        user_id=str(context.message.author.id)).first()
 
     user_balance_wallet: models.Wallet = models.Wallet.objects(
         wallet_address=user.balance_wallet_address).first()
@@ -194,56 +184,55 @@ async def optimize(context: commands.Context):
     estimate = store.estimate_fusion(user, threshold)
 
     if estimate['fusion_ready_count'] == 0:
-        await bot.reply('No optimizable outputs!')
+        await context.send('No optimizable outputs!')
         return
 
     optimize = store.send_fusion(user, threshold)
 
-    await bot.send_message(
-        context.message.author, 'Fusion transaction sent.\n'
-        f'Transaction hash: `{optimize.tx_hash}`')
+    await context.send('Fusion transaction sent.\n'
+                       f'Transaction hash: `{optimize.tx_hash}`')
 
 
 @register.error
-async def register_error(error, _: commands.Context):
-    await handle_errors(error)
+async def register_error(context: commands.Context, error):
+    await handle_errors(context, error)
 
 
 @info.error
-async def info_error(error, _: commands.Context):
-    await handle_errors(error)
+async def info_error(context: commands.Context, error):
+    await handle_errors(context, error)
 
 
 @balance.error
-async def balance_error(error, _: commands.Context):
-    await handle_errors(error)
+async def balance_error(context: commands.Context, error):
+    await handle_errors(context, error)
 
 
 @withdraw.error
-async def withdraw_error(error, _: commands.Context):
-    await handle_errors(error)
+async def withdraw_error(context: commands.Context, error):
+    await handle_errors(context, error)
 
 
 @tip.error
-async def tip_error(error, _: commands.Context):
-    await handle_errors(error)
+async def tip_error(context: commands.Context, error):
+    await handle_errors(context, error)
 
 
 @outputs.error
-async def outputs_error(error, _: commands.Context):
-    await handle_errors(error)
+async def outputs_error(context: commands.Context, error):
+    await handle_errors(context, error)
 
 
 @optimize.error
-async def optimize_error(error, _: commands.Context):
-    await handle_errors(error)
+async def optimize_error(context: commands.Context, error):
+    await handle_errors(context, error)
 
 
-async def handle_errors(error):
+async def handle_errors(context: commands.Context, error):
     if isinstance(error, commands.BadArgument):
-        await bot.say(f'Invalid arguments provided.\n\n{error.args[0]}')
+        await context.send(f'Invalid arguments provided.\n\n{error.args[0]}')
     else:
-        await bot.say(f'Unexpected error.\n\n{error}')
+        await context.send(f'Unexpected error.\n\n{error}')
 
 
 async def update_balance_wallets():
