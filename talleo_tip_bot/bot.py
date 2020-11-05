@@ -4,6 +4,8 @@ import discord
 import mongoengine
 from discord.ext import commands
 
+from mongoengine.errors import ValidationError
+
 from talleo_tip_bot import models, store
 from talleo_tip_bot.config import config
 
@@ -15,6 +17,7 @@ bot_help_register = "Register or change your withdrawal address."
 bot_help_info = "Get your account's info."
 bot_help_withdraw = f"Withdraw {TALLEO_REPR} from your balance."
 bot_help_balance = f"Check your {TALLEO_REPR} balance."
+bot_help_transfer = f"Send {TALLEO_REPR} to external wallet from your balance."
 bot_help_tip = f"Give {TALLEO_REPR} to a user from your balance."
 bot_help_optimize = "Optimize wallet."
 bot_help_outputs = "Get number of optimizable and unspent outputs."
@@ -109,6 +112,49 @@ async def withdraw(context: commands.Context, amount: float):
     await context.send(f'You have withdrawn {real_amount / TALLEO_DIGITS:.2f} '
                        f'{TALLEO_REPR}.\n'
                        f'Transaction hash: `{withdrawal.tx_hash}`')
+
+
+@bot.command(help=bot_help_transfer)
+async def transfer(context: commands.Context, recipient: str, amount: float):
+    user_from: models.User = models.User.objects(
+        user_id=str(context.message.author.id)).first()
+    user_from_wallet: models.Wallet = models.Wallet.objects(
+        wallet_address=user_from.balance_wallet_address).first()
+    real_amount = int(amount * TALLEO_DIGITS)
+
+    user_to: models.Wallet = models.Wallet.objects(
+        wallet_address=recipient).first()
+    if user_to is None:
+        try:
+            user_to = models.Wallet(wallet_address=recipient)
+            user_to.save()
+        except ValidationError:
+            await context.send('Invalid wallet address!')
+            return
+
+    if real_amount + config.tx_fee >= user_from_wallet.actual_balance:
+        await context.send(f'Insufficient balance to send transfer of '
+                           f'{real_amount / TALLEO_DIGITS:.2f} '
+                           f'{TALLEO_REPR} to @{recipient}.')
+        return
+
+    if real_amount > config.max_tx_amount:
+        await context.send(f'Transactions cannot be bigger than '
+                           f'{config.max_tx_amount / TALLEO_DIGITS:.2f} '
+                           f'{TALLEO_REPR}.')
+        return
+    elif real_amount < config.min_tx_amount:
+        await context.send(f'Transactions cannot be smaller than '
+                           f'{config.min_tx_amount / TALLEO_DIGITS:.2f} '
+                           f'{TALLEO_REPR}.')
+        return
+
+    transfer = store.send(user_from, user_to, real_amount)
+
+    await context.send(f'Transfer of {real_amount / TALLEO_DIGITS:.2f} '
+                       f'{TALLEO_REPR} '
+                       f'was sent to {recipient}\n'
+                       f'Transaction hash: {transfer.tx_hash}')
 
 
 @bot.command(help=bot_help_tip)
@@ -211,6 +257,11 @@ async def balance_error(context: commands.Context, error):
 
 @withdraw.error
 async def withdraw_error(context: commands.Context, error):
+    await handle_errors(context, error)
+
+
+@transfer.error
+async def transfer_error(context: commands.Context, error):
     await handle_errors(context, error)
 
 
