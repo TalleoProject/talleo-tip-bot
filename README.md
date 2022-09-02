@@ -14,7 +14,7 @@ This is a Discord bot that can transfer TLO between users. It supports:
 - MongoDB
 - walletd (wallet daemon)
 - Talleod (coin daemon)
-- Python 3.6
+- Python 3.8
 - [Discord Bot Token](https://discordapp.com/developers/applications/me)
 
 I recommend using `supervisor` to keep `Talleod`, `walletd`

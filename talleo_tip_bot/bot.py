@@ -22,7 +22,31 @@ bot_help_tip = f"Give {TALLEO_REPR} to a user from your balance."
 bot_help_optimize = "Optimize wallet."
 bot_help_outputs = "Get number of optimizable and unspent outputs."
 
-bot = commands.Bot(command_prefix='$')
+
+# Create bot
+class TipBot(commands.Bot):
+
+    def __init__(self, *args, **kwargs):
+        super(TipBot, self).__init__(*args, **kwargs)
+
+    async def update_balance_wallets(self):
+        while not self.is_closed():
+            store.update_balances()
+            await asyncio.sleep(config.wallet_balance_update_interval)
+
+    # print list of servers where this bot is active to console
+    async def list_servers(self):
+        await self.tree.sync()
+        while not self.is_closed():
+            # you can customize the output message(s) below
+            print("--- TIP BOT ONLINE ---")
+            for guild in self.guilds:
+                # you can customize the output message(s) below
+                print('Active servers: ' + str(guild.name))
+            await asyncio.sleep(600)
+
+intents = discord.Intents.all()
+bot = TipBot(command_prefix='$', intents=intents)
 
 
 @bot.event
@@ -30,9 +54,11 @@ async def on_ready():
     print('Ready!')
     print(bot.user.name)
     print(bot.user.id)
+    bot.loop.create_task(bot.update_balance_wallets())
+    bot.loop.create_task(bot.list_servers())
 
 
-@bot.command(help=bot_help_info)
+@bot.hybrid_command(help=bot_help_info)
 async def info(context: commands.Context):
     user = store.register_user(str(context.message.author.id))
     await context.send(f'**Account Info**\n\n'
@@ -40,7 +66,7 @@ async def info(context: commands.Context):
                        f'Registered Wallet: `{user.user_wallet_address}`')
 
 
-@bot.command(help=bot_help_balance)
+@bot.hybrid_command(help=bot_help_balance)
 async def balance(context: commands.Context):
     user = store.register_user(str(context.message.author.id))
     wallet = store.get_user_wallet(user.user_id)
@@ -52,7 +78,7 @@ async def balance(context: commands.Context):
         f'{TALLEO_REPR}\n')
 
 
-@bot.command(help=bot_help_register)
+@bot.hybrid_command(help=bot_help_register)
 async def register(context: commands.Context, wallet_address: str):
     user_id = str(context.message.author.id)
 
@@ -77,7 +103,7 @@ async def register(context: commands.Context, wallet_address: str):
                        f'balance will be available once confirmed.')
 
 
-@bot.command(help=bot_help_withdraw)
+@bot.hybrid_command(help=bot_help_withdraw)
 async def withdraw(context: commands.Context, amount: float):
     user: models.User = models.User.objects(
         user_id=str(context.message.author.id)).first()
@@ -114,7 +140,7 @@ async def withdraw(context: commands.Context, amount: float):
                        f'Transaction hash: `{withdrawal.tx_hash}`')
 
 
-@bot.command(help=bot_help_transfer)
+@bot.hybrid_command(help=bot_help_transfer)
 async def transfer(context: commands.Context, recipient: str, amount: float):
     user_from: models.User = models.User.objects(
         user_id=str(context.message.author.id)).first()
@@ -157,7 +183,7 @@ async def transfer(context: commands.Context, recipient: str, amount: float):
                        f'Transaction hash: {transfer.tx_hash}')
 
 
-@bot.command(help=bot_help_tip)
+@bot.hybrid_command(help=bot_help_tip)
 async def tip(context: commands.Context, member: discord.Member,
               amount: float):
     user_from: models.User = models.User.objects(
@@ -201,7 +227,7 @@ async def tip(context: commands.Context, member: discord.Member,
                        f'Transaction hash: `{tip.tx_hash}`')
 
 
-@bot.command(help=bot_help_outputs)
+@bot.hybrid_command(help=bot_help_outputs)
 async def outputs(context: commands.Context):
     user = models.User = models.User.objects(
         user_id=str(context.message.author.id)).first()
@@ -218,7 +244,7 @@ async def outputs(context: commands.Context):
         f'Unspent outputs: `{estimate.total_count}`')
 
 
-@bot.command(help=bot_help_optimize)
+@bot.hybrid_command(help=bot_help_optimize)
 async def optimize(context: commands.Context):
     user = models.User = models.User.objects(
         user_id=str(context.message.author.id)).first()
@@ -287,19 +313,12 @@ async def handle_errors(context: commands.Context, error):
         await context.send(f'Unexpected error.\n\n{error}')
 
 
-async def update_balance_wallets():
-    while not bot.is_closed:
-        store.update_balances()
-        await asyncio.sleep(config.wallet_balance_update_interval)
-
-
 @click.command()
 def main():
     mongoengine.connect(db=config.database.db, host=config.database.host,
                         port=config.database.port,
                         username=config.database.user,
                         password=config.database.password)
-    bot.loop.create_task(update_balance_wallets())
     bot.run(config.discord.token)
 
 
