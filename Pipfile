@@ -1,27 +1,22 @@
 [[source]]
-
+name = "pypi"
 url = "https://pypi.python.org/simple"
 verify_ssl = true
 
-
 [requires]
-
-python_version = "3.6"
-
+python_version = "3.8"
 
 [packages]
-
 requests = "*"
-"discord.py" = "*"
+discord-py = ">=2.0.0"
 mongoengine = "*"
 pyyaml = "*"
 munch = "*"
 click = "*"
 
-
 [dev-packages]
-
-"flake8" = "*"
+flake8 = "*"
 yapf = "*"
+pipenv = "*"
 pytest = "*"
 pytest-cov = "*"

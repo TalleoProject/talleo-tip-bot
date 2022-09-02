@@ -8,14 +8,6 @@ jobs:
       fail-fast: true
       matrix:
         include:
-          - name: Ubuntu 18.04 - Python 3.6
-            os: ubuntu-18.04
-            python-minor: 6
-
-          - name: Ubuntu 18.04 - Python 3.7
-            os: ubuntu-18.04
-            python-minor: 7
-
           - name: Ubuntu 20.04 - Python 3.8
             os: ubuntu-20.04
             python-minor: 8
@@ -23,6 +15,10 @@ jobs:
           - name: Ubuntu 20.04 - Python 3.9
             os: ubuntu-20.04
             python-minor: 9
+
+          - name: Ubuntu 22.04 - Python 3.10
+            os: ubuntu-22.04
+            python-minor: 10
 
     steps:
     - name: Checkout repository
