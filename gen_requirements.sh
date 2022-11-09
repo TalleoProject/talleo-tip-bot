@@ -1,3 +1,3 @@
 #!/bin/bash
-pipenv requirements | grep -v '^\-i ' | cut -d ';' -f 1 - | cut -d ' ' -f 1 - > requirements.txt
-pipenv requirements --dev | grep -v '^\-i ' | cut -d ';' -f 1 - | cut -d ' ' -f 1 - > requirements-dev.txt
+pipenv requirements | sed 's/^-e \(.*\)#egg=\(.*\)/\2 @ \1/g' | grep -v '^\-i ' | cut -d ';' -f 1 - | sed 's/[[:blank:]]*$//' > requirements.txt
+pipenv requirements --dev | sed 's/^-e \(.*\)#egg=\(.*\)/\2 @ \1/g' | grep -v '^\-i ' | cut -d ';' -f 1 - | sed 's/[[:blank:]]*$//' > requirements-dev.txt
