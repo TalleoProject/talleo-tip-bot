@@ -45,6 +45,7 @@ class TipBot(commands.Bot):
                 print('Active servers: ' + str(guild.name))
             await asyncio.sleep(600)
 
+
 intents = discord.Intents.all()
 bot = TipBot(command_prefix='$', intents=intents)
 
@@ -135,9 +136,10 @@ async def withdraw(context: commands.Context, amount: float):
         return
 
     withdrawal = store.withdraw(user, real_amount)
-    await context.reply(f'You have withdrawn {real_amount / TALLEO_DIGITS:.2f} '
-                        f'{TALLEO_REPR}.\n'
-                        f'Transaction hash: `{withdrawal.tx_hash}`')
+    await context.reply(
+        f'You have withdrawn {real_amount / TALLEO_DIGITS:.2f} '
+        f'{TALLEO_REPR}.\n'
+        f'Transaction hash: `{withdrawal.tx_hash}`')
 
 
 @bot.hybrid_command(help=bot_help_transfer)
