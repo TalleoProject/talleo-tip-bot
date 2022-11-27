@@ -36,7 +36,6 @@ class TipBot(commands.Bot):
 
     # print list of servers where this bot is active to console
     async def list_servers(self):
-        await self.tree.sync()
         while not self.is_closed():
             # you can customize the output message(s) below
             print("--- TIP BOT ONLINE ---")
@@ -47,14 +46,15 @@ class TipBot(commands.Bot):
 
 
 intents = discord.Intents.all()
-bot = TipBot(command_prefix='$', intents=intents)
+bot = TipBot(command_prefix='$', description=bot_description, intents=intents)
 
 
 @bot.event
 async def on_ready():
     print('Ready!')
-    print(bot.user.name)
-    print(bot.user.id)
+    print(f'User name: {bot.user.name}')
+    print(f'User ID:   {bot.user.id}')
+    await bot.tree.sync()
     bot.loop.create_task(bot.update_balance_wallets())
     bot.loop.create_task(bot.list_servers())
 
