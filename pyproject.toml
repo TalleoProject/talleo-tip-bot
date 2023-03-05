@@ -1,3 +1,28 @@
 [build-system]
 requires = ["setuptools>=42", "wheel"]   # PEP 508 specifications.
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "talleo-tip-bot"
+authors = [
+    {name = "Mika Lindqvist", email = "postmaster@raasu.org"},
+]
+description = "Discord tipbot for Talleo"
+readme = "README.md"
+keywords = ["discord", "tipbot", "talleo"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+]
+dependencies = [
+    "certifi>=2012.12.7",
+    "click",
+    "discord-py>=2.0.0",
+    "mongoengine",
+    "munch",
+    "pyyaml",
+    "requests",
+]
+dynamic = ["version"]
+
+[tool.setuptools.dynamic]
+version = {attr = "talleo_tip_bot.__version__"}
