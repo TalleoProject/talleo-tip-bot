@@ -20,7 +20,7 @@ dependencies = [
     "mongoengine",
     "munch",
     "pyyaml",
-    "requests",
+    "requests>=2.31",
 ]
 dynamic = ["version"]
 
