@@ -16,7 +16,7 @@ classifiers = [
 dependencies = [
     "certifi>=2012.12.7",
     "click",
-    "discord-py>=2.0.0",
+    "discord.py>=2.0.0",
     "mongoengine",
     "munch",
     "pyyaml",
