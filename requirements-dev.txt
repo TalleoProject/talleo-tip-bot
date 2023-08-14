@@ -23,7 +23,7 @@ attrs==23.1.0
 charset-normalizer==3.2.0
 click==8.1.6
 discord-py==2.3.1
-dnspython==2.4.1
+dnspython==2.4.2
 frozenlist==1.4.0
 idna==3.4
 mongoengine==0.27.0
