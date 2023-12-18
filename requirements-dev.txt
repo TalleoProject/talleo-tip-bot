@@ -1,5 +1,5 @@
 certifi==2023.11.17
-distlib==0.3.7
+distlib==0.3.8
 filelock==3.13.1
 flake8==6.1.0
 importlib-metadata==7.0.0
