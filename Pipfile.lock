@@ -345,12 +345,12 @@
         },
         "mongoengine": {
             "hashes": [
-                "sha256:34f28f34295fe095037c0219e528e72745d405d998d96773e8b1286694a2d38d",
-                "sha256:d4eebe5fd271a6f1bacda8806204800fe1872582d0852c561a10f63e9ff31666"
+                "sha256:67c35a2ebe0ee7fd8eda3766dc251b9e0aada4489bb935f7a55b4c570d148ca7",
+                "sha256:8e0f84a5ad3d335e5da98261454d4ab546c866241ed064adc6433fe2077d43c9"
             ],
             "index": "pypi",
             "markers": "python_version >= '3.7'",
-            "version": "==0.28.0"
+            "version": "==0.28.2"
         },
         "multidict": {
             "hashes": [
@@ -753,11 +753,11 @@
         },
         "importlib-metadata": {
             "hashes": [
-                "sha256:4805911c3a4ec7c3966410053e9ec6a1fecd629117df5adee56dfc9432a1081e",
-                "sha256:f238736bb06590ae52ac1fab06a3a9ef1d8dce2b7a35b5ab329371d6c8f5d2cc"
+                "sha256:198f568f3230878cb1b44fbd7975f87906c22336dba2e4a7f05278c281fbd792",
+                "sha256:f4bc4c0c070c490abf4ce96d715f68e95923320370efb66143df00199bb6c100"
             ],
             "markers": "python_version >= '3.8'",
-            "version": "==7.0.1"
+            "version": "==7.0.2"
         },
         "mccabe": {
             "hashes": [
