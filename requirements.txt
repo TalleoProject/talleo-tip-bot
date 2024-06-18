@@ -15,5 +15,5 @@ munch==4.0.0
 pymongo==4.7.3
 pyyaml==6.0.1
 requests==2.32.3
-urllib3==2.2.1
+urllib3==2.2.2
 yarl==1.9.4
