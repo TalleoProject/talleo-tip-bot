@@ -9,12 +9,13 @@ click==8.1.7
 discord.py==2.4.0
 dnspython==2.6.1
 frozenlist==1.4.1
-idna==3.8
+idna==3.10
 mongoengine==0.29.0
-multidict==6.0.5
+multidict==6.1.0
 munch==4.0.0
 pymongo==4.8.0
 pyyaml==6.0.2
 requests==2.32.3
-urllib3==2.2.2
-yarl==1.11.0
+typing-extensions==4.12.2
+urllib3==2.2.3
+yarl==1.11.1
