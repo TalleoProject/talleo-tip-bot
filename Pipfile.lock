@@ -263,11 +263,11 @@
         },
         "discord.py": {
             "hashes": [
-                "sha256:b8af6711c70f7e62160bfbecb55be699b5cb69d007426759ab8ab06b1bd77d1d",
-                "sha256:d07cb2a223a185873a1d0ee78b9faa9597e45b3f6186df21a95cec1e9bcdc9a5"
+                "sha256:8e1e3b3ff5a112a4ab3a615059a285238eea34edff6de8737db6e1f72ea05195",
+                "sha256:f6827909b87ea89bdb2cc49d475cb1fada2e73235a3e4568fc8b113660340c73"
             ],
             "markers": "python_version >= '3.8'",
-            "version": "==2.4.0"
+            "version": "==2.5.0"
         },
         "dnspython": {
             "hashes": [
