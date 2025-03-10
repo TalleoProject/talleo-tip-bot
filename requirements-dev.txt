@@ -23,7 +23,7 @@ async-timeout==5.0.1
 attrs==25.1.0
 charset-normalizer==3.4.1
 click==8.1.8
-discord.py==2.5.0
+discord.py==2.5.2
 dnspython==2.6.1
 frozenlist==1.5.0
 idna==3.10
