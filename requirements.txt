@@ -6,7 +6,7 @@ attrs==25.3.0
 certifi==2025.8.3
 charset-normalizer==3.4.3
 click==8.1.8
-discord.py==2.5.2
+discord.py==2.6.2
 dnspython==2.7.0
 frozenlist==1.7.0
 idna==3.10
@@ -14,9 +14,9 @@ mongoengine==0.29.1
 multidict==6.6.4
 munch==4.0.0
 propcache==0.3.2
-pymongo==4.14.0
+pymongo==4.14.1
 pyyaml==6.0.2
-requests==2.32.4
+requests==2.32.5
 typing-extensions==4.14.1
 urllib3==2.5.0
 yarl==1.20.1
